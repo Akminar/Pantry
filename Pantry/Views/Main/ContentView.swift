@@ -12,8 +12,8 @@ struct ContentView: View {
     
     let icons = [
         "house",
-        "book",
         "rectangle.split.3x3",
+        "book"
     ]
     
     var body: some View {
