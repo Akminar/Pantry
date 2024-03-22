@@ -8,14 +8,62 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State var selectedIndex = 0
+    
+    let icons = [
+        "house",
+        "book",
+        "rectangle.split.3x3",
+    ]
+    
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Github push test!")
+        VStack(spacing: 0) {
+            ZStack {
+                switch selectedIndex{
+                case 0:
+                    NavigationView {
+                        VStack {
+                            Text("First Screen")
+                        }
+                        .navigationTitle("Home")
+                    }
+                case 1:
+                    NavigationView {
+                        VStack {
+                            Text("Second Screen")
+                        }
+                        .navigationTitle("Pantry")
+                    }
+                default:
+                    NavigationView {
+                        VStack {
+                            Text("Third Screen")
+                        }
+                        .navigationTitle("Recipes")
+                    }
+                }
+            }
+            
+            Divider()
+                .padding(.bottom, 10)
+            
+            HStack {
+                ForEach(0..<3, id: \.self) { number in
+                    Spacer()
+                    Button(action: {
+                        self.selectedIndex = number
+                    }, label: {
+                        Image(systemName: icons[number])
+                            .font(.system(
+                                    size: 25,
+                                    weight: .regular,
+                                    design: .default))
+                            .foregroundColor(selectedIndex == number ? Color(.label) : Color(UIColor.lightGray))
+                    })
+                    Spacer()
+                }
+            }
         }
-        .padding()
     }
 }
 
