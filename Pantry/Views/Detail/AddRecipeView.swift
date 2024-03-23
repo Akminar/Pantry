@@ -14,7 +14,8 @@ struct AddRecipeView: View {
     @State private var description: String = ""
     @State private var ingredients: String = ""
     @State private var directions: String = ""
-    @State private var navigateToRecipe = false
+    @State private var image: String = ""
+    @State private var isNewRecipeAdded = false
     
     @Environment(\.dismiss) var dismiss
     
@@ -36,37 +37,41 @@ struct AddRecipeView: View {
                 Section(header: Text("Directions")) {
                     TextEditor(text: $directions)
                 }
+                
+                Section(header: Text("Image URL")) {
+                    TextEditor(text: $image)
+                }
             }
-            .toolbar(content: {
+            .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button {
+                    Button(action: {
                         dismiss()
-                    } label: {
+                    }) {
                         Label("Cancel", systemImage: "xmark")
                             .labelStyle(.iconOnly)
                     }
                 }
                 
                 ToolbarItem {
-                    Button {
+                    Button(action: {
                         saveRecipe()
-                        navigateToRecipe = true
-                    } label: {
+                        isNewRecipeAdded = true
+                    }) {
                         Label("Done", systemImage: "checkmark")
                             .labelStyle(.iconOnly)
                     }
                     .disabled(name.isEmpty)
+                    .navigationDestination(isPresented: $isNewRecipeAdded) {
+                        RecipeView(recipe: recipesVM.recipes.sorted{ $0.datePublished < $1.datePublished}[0])
+                            .navigationBarBackButtonHidden(true)
+                    }
                 }
-            })
-            
-            .sheet(isPresented: $navigateToRecipe) {
-                RecipeView(recipe: recipesVM.recipes.sorted{ $0.datePublished > $1.datePublished}[0]).navigationBarBackButtonHidden(true)
             }
             .navigationTitle("New Recipe")
             .navigationBarTitleDisplayMode(.inline)
         }
-        }
     }
+}
 
 struct AddRecipe_Preview: PreviewProvider {
     static var previews: some View {
@@ -76,7 +81,15 @@ struct AddRecipe_Preview: PreviewProvider {
 
 extension AddRecipeView {
     private func saveRecipe() {
-        let recipe = Recipe(name: name, image: "", description: description, ingredients: ingredients, directions: directions, datePublished: "", url: "")
+        let now = Date()
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "mm-dd-yy"
+        
+        let datePublished = dateFormatter.string(from: now)
+        print(datePublished)
+        
+        let recipe = Recipe(name: name, image: image, description: description, ingredients: ingredients, directions: directions, datePublished: "", url: "")
         recipesVM.addRecipe(recipe: recipe)
     }
 }
